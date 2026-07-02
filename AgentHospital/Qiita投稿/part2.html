@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Part 2 — ミニ版 Agent Hospital 構築</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+    color: #24292f;
+    line-height: 1.75;
+    background: #fff;
+  }
+  .part-label {
+    display: inline-block;
+    font-size: 0.82em;
+    font-weight: 600;
+    color: #57606a;
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+    border-radius: 999px;
+    padding: 4px 12px;
+    margin-bottom: 1em;
+  }
+  h1 { font-size: 1.5em; line-height: 1.35; margin: 0 0 0.6em; }
+  h2 {
+    font-size: 1.35em;
+    margin-top: 2.4em;
+    margin-bottom: 0.6em;
+    padding-bottom: 0.35em;
+    border-bottom: 2px solid #222;
+  }
+  h3 { font-size: 1.08em; margin-top: 1.6em; margin-bottom: 0.4em; }
+  p { margin: 0.75em 0; }
+  ul, ol { margin: 0.6em 0; padding-left: 1.4em; }
+  li { margin: 0.35em 0; }
+  blockquote {
+    margin: 1.2em 0;
+    padding: 12px 16px;
+    background: #fff8c5;
+    border-left: 4px solid #d4a72c;
+    color: #57606a;
+    font-size: 0.92em;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+    font-size: 0.94em;
+  }
+  th, td {
+    border: 1px solid #d0d7de;
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th { background: #f6f8fa; }
+  pre {
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-size: 0.88em;
+    line-height: 1.5;
+  }
+  .next, .refs {
+    margin-top: 3em;
+    padding-top: 1.5em;
+    border-top: 1px solid #d0d7de;
+  }
+  .next h2, .refs h2 { font-size: 1.15em; margin-top: 0; border: none; padding: 0; }
+</style>
+</head>
+<body>
+
+<span class="part-label">Part 2</span>
+<h1>ミニ版構築（8〜10章）</h1>
+
+<blockquote>
+  <p>本ファイルは <strong>Part 2</strong> です。Part 1（論文解説）の続きから読んでください。</p>
+</blockquote>
+
+<h2>8. ミニ版 Agent Hospital の設計</h2>
+
+<p>論文を丸ごと再現するのではなく、<strong>診察 → 正誤判定 → 反省 → 経験蓄積</strong> のコアだけを切り出します。</p>
+
+<h3>8-1. 再現する部分 / 省略する部分</h3>
+
+<table>
+  <thead><tr><th>論文の要素</th><th>ミニ版</th></tr></thead>
+  <tbody>
+    <tr><td>問診・診断・反省・経験蓄積</td><td><strong>再現</strong></td></tr>
+    <tr><td>患者・正誤判定</td><td><strong>簡略再現</strong>（症例 JSON + ルール）</td></tr>
+    <tr><td>トリアージ・看護師・32 診療科・患者自動生成</td><td><strong>省略</strong></td></tr>
+    <tr><td>embedding 検索</td><td><strong>省略</strong> → ツールでファイル読み書き</td></tr>
+  </tbody>
+</table>
+
+<h3>8-2. スコープとワークフロー</h3>
+
+<p>1 回の診察が完結するフローに絞ります。実装では次の <strong>4 ノード</strong>（処理の塊）に分けます。英語名はコード上の識別子です。</p>
+
+<table>
+  <thead><tr><th>ノード名</th><th>意味</th><th>種類</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Pre-Consult</strong></td><td><strong>診察前準備</strong> — 過去の教訓を読み込む</td><td>Python</td></tr>
+    <tr><td><strong>Interview</strong></td><td><strong>問診・診断</strong></td><td>LLM</td></tr>
+    <tr><td><strong>Patient/Env</strong></td><td><strong>患者・環境</strong> — 症状・検査結果を返す</td><td>Python or LLM</td></tr>
+    <tr><td><strong>Reflection</strong></td><td><strong>反省</strong> — 正解比較・教訓追記</td><td>Python + LLM</td></tr>
+  </tbody>
+</table>
+
+<pre>診察前準備 → 問診・診断 ⇄ 患者・環境 → 反省
+(Pre-Consult)  (Interview)  (Patient/Env)  (Reflection)</pre>
+
+<p>制御は <strong>AWS Strands</strong> の <code>GraphBuilder</code> に任せます。</p>
+
+<h3>8-3. 技術スタック</h3>
+
+<ul>
+  <li><strong>Strands + GraphBuilder</strong> — ワークフロー明示</li>
+  <li><strong>記憶</strong> — <code>storage/</code> + Agent Skills（<code>SKILL.md</code> + <code>scripts/</code>）</li>
+  <li><strong>正誤判定</strong> — 症例 JSON の <code>ground_truth</code> と照合</li>
+</ul>
+
+<h2>9. 実装</h2>
+
+<h3>9-1. 各ノードの処理</h3>
+
+<ol>
+  <li><strong>Pre-Consult</strong> — <code>global-lessons</code> Skill で教訓読み込み</li>
+  <li><strong>Interview</strong> — 問診・診断。<code>patient-record</code> Skill でカルテ追記</li>
+  <li><strong>Patient/Env</strong> — 症例 JSON から応答</li>
+  <li><strong>Reflection</strong> — <code>global-lessons</code> Skill で教訓追記</li>
+</ol>
+
+<h3>9-2. 記憶を Skills 形式で置く</h3>
+
+<p><strong>データ</strong>（<code>storage/</code>）と<strong>読み書きの手順</strong>（<code>skills/</code>）を分けます。各 Skill は <code>SKILL.md</code>（YAML + 本文）+ <code>scripts/</code>。起動時は <code>name</code> / <code>description</code> のみプロンプトに載り、必要時に有効化します。</p>
+
+<pre>skills/
+├── global-lessons/SKILL.md + scripts/
+└── patient-record/SKILL.md + scripts/
+
+storage/
+├── doctor/global_lessons.json
+└── patients/patient_001.json</pre>
+
+<table>
+  <thead><tr><th>Skill</th><th>いつ</th><th>触るファイル</th></tr></thead>
+  <tbody>
+    <tr><td>global-lessons</td><td>Pre-Consult / Reflection</td><td>global_lessons.json</td></tr>
+    <tr><td>patient-record</td><td>Interview</td><td>patient_xxx.json</td></tr>
+  </tbody>
+</table>
+
+<h3>9-3. つまずきそうな点</h3>
+
+<ul>
+  <li>ループ終了の判定（構造化出力が必要）</li>
+  <li>教訓の肥大化（論理削除）</li>
+  <li>API コスト</li>
+</ul>
+
+<h2>10. 動かしてみた結果</h2>
+
+<blockquote><p>追記予定。指標：正答率・教訓数・ターン数。具体例と論文差分は Part 3 へ接続。</p></blockquote>
+
+<div class="next">
+  <h2>次へ</h2>
+  <p>続きは <strong>Part 3</strong> です。</p>
+</div>
+
+<div class="refs">
+  <h2>本 Part の参考</h2>
+  <ul>
+    <li>Part 1 — 論文解説</li>
+    <li><code>実装検討.txt</code></li>
+  </ul>
+</div>
+
+</body>
+</html>
