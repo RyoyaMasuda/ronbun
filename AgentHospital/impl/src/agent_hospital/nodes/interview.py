@@ -22,6 +22,7 @@ def create_interview_agent() -> Agent:
         name="interview",
         system_prompt=(
             "あなたは医師エージェントです。患者への問診を行い、最終的に診断を下してください。"
+            "患者の返答は入力メッセージ（直前ノード patient_env の出力）に含まれます。"
             "必要なら patient-record / global-lessons の Skill を有効化してカルテ・教訓を参照してください。"
             "診断が確定したら、応答の末尾に [DIAGNOSIS: 病名] と書いてください。"
         ),

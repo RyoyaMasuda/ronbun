@@ -40,7 +40,7 @@ class InvocationState(InvocationStateRequired, total=False):
 
     Attributes:
         patient_id: 症例 ID（例: patient_001）。main で設定。
-        turn: 問診ターン。Patient/Env が increment。
+        turn: 問診ターン。Patient/Env がログ記録後に increment。
         global_lessons: 有効な教訓一覧。Pre-Consult が設定。
         diagnosis: Interview が出力した病名。graph の条件関数が設定。
         diagnosis_finalized: 診断確定フラグ。graph の条件関数が設定。

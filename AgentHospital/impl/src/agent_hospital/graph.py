@@ -13,9 +13,10 @@ from strands.multiagent.graph import GraphState
 
 from agent_hospital.nodes.function_node import FunctionNode
 from agent_hospital.nodes.interview import create_interview_agent
-from agent_hospital.nodes.patient_env import run_patient_env
+from agent_hospital.nodes.patient_env import PatientEnvNode
 from agent_hospital.nodes.pre_consult import run_pre_consult
 from agent_hospital.nodes.reflection import run_reflection
+from agent_hospital.nodes.text_utils import agent_result_text
 from agent_hospital.state import InvocationState
 
 
@@ -44,52 +45,52 @@ def _interview_text(state: GraphState) -> str:
     node = state.results.get("interview")
     if not node:
         return ""
-    result = node.result
-    if hasattr(result, "message"):
-        blocks = result.message.get("content", []) if isinstance(result.message, dict) else result.message.content
-        return " ".join(
-            block.get("text", "") if isinstance(block, dict) else getattr(block, "text", "")
-            for block in blocks
-        )
-    return str(result)
+    return agent_result_text(node)
 
 
-def after_interview_to_patient(state: GraphState, *, invocation_state: InvocationState, **kwargs: Any) -> bool:
-    """Interview から Patient/Env へ進む条件。
-
-    診断未確定（[DIAGNOSIS: ...] なし）のとき True。確定時は diagnosis を
-    invocation_state に書き込み False を返す。
+def _update_diagnosis_state(state: GraphState, invocation_state: InvocationState) -> bool:
+    """Interview の出力を読み、invocation_state の診断フラグを更新する。
 
     Args:
         state: グラフ実行中の状態。
         invocation_state: ノード間共有状態。
-        **kwargs: Strands から渡される追加引数（未使用）。
 
     Returns:
-        Patient/Env へ遷移する場合 True。
+        [DIAGNOSIS: 病名] が見つかり診断確定した場合 True。
     """
-    text = _interview_text(state)
-    diagnosis = _extract_diagnosis(text)
+    diagnosis = _extract_diagnosis(_interview_text(state))
     if diagnosis:
         invocation_state["diagnosis"] = diagnosis
         invocation_state["diagnosis_finalized"] = True
-        return False
+        return True
     invocation_state["diagnosis_finalized"] = False
-    return True
+    return False
 
 
-def after_interview_to_reflection(state: GraphState, *, invocation_state: InvocationState, **kwargs: Any) -> bool:
-    """Interview から Reflection へ進む条件。
+def needs_patient_response(
+    state: GraphState, *, invocation_state: InvocationState, **kwargs: Any
+) -> bool:
+    """Interview 後に patient_env へ進むか。
 
-    Args:
-        state: グラフ実行中の状態（本関数では未使用）。
-        invocation_state: diagnosis_finalized が True のとき Reflection へ遷移。
-        **kwargs: Strands から渡される追加引数（未使用）。
+    医師がまだ質問中（[DIAGNOSIS: ...] なし）→ True → 患者の返答を取りに行く。
 
     Returns:
-        Reflection へ遷移する場合 True。
+        patient_env へ進む場合 True。
     """
-    return bool(invocation_state.get("diagnosis_finalized"))
+    return not _update_diagnosis_state(state, invocation_state)
+
+
+def ready_for_reflection(
+    state: GraphState, *, invocation_state: InvocationState, **kwargs: Any
+) -> bool:
+    """Interview 後に reflection へ進むか。
+
+    医師が診断確定（[DIAGNOSIS: ...] あり）→ True → 振り返りへ進む。
+
+    Returns:
+        reflection へ進む場合 True。
+    """
+    return _update_diagnosis_state(state, invocation_state)
 
 
 def build_graph():
@@ -98,43 +99,30 @@ def build_graph():
     Returns:
         実行可能な Graph インスタンス。エントリポイントは pre_consult。
     """
-    # フロー全体:
-    #
-    #   pre_consult ──→ interview ──(診断未確定)──→ patient_env ──┐
-    #                      ↑                                    │
-    #                      └────────────────────────────────────┘
-    #                      │
-    #                      └──(診断確定 [DIAGNOSIS: ...])──→ reflection
-    #
-    # interview から patient_env / reflection の2本のエッジが出ている。
-    # 各エッジの condition が True のときだけその方向へ進む。
-
     builder = GraphBuilder()
 
-    # --- ノード登録 ---
-    # FunctionNode = Python 関数を Strands ノードとして包むラッパー
-    builder.add_node(FunctionNode(run_pre_consult, name="pre_consult"), "pre_consult")   # 教訓読み込み
-    builder.add_node(FunctionNode(run_patient_env, name="patient_env"), "patient_env")   # 患者の返答（症例 JSON）
-    builder.add_node(FunctionNode(run_reflection, name="reflection"), "reflection")       # 正誤判定・教訓追記
+    builder.add_node(FunctionNode(run_pre_consult, name="pre_consult"), "pre_consult")
+    builder.add_node(PatientEnvNode(), "patient_env")
+    builder.add_node(FunctionNode(run_reflection, name="reflection"), "reflection")
 
-    # Interview だけ LLM Agent（Skills + file_read/shell ツール付き）
     interview: Agent = create_interview_agent()
     builder.add_node(interview, "interview")
 
-    # --- エッジ（遷移）登録 ---
-    builder.add_edge("pre_consult", "interview")  # 診察前準備のあと、必ず問診へ
+    builder.add_edge("pre_consult", "interview")
 
-    # Interview 直後: まだ [DIAGNOSIS: ...] がなければ患者の返答を取りに行く
-    builder.add_edge("interview", "patient_env", condition=after_interview_to_patient)
+    # Interview の直後は2択。condition が True のエッジだけ通る（同時には両方通らない）。
+    #
+    #   Interview の出力                    → 次に動くノード
+    #   ─────────────────────────────────────────────────────
+    #   「いつから痛みますか？」など          → patient_env（患者の返答）
+    #   「…[DIAGNOSIS: 帯状疱疹]」と確定     → reflection（正誤判定）
+    builder.add_edge("interview", "patient_env", condition=needs_patient_response)
+    builder.add_edge("interview", "reflection", condition=ready_for_reflection)
 
-    # Patient/Env の返答をもとに、もう一度 Interview へ（問診ループ）
+    # patient_env の次は必ず interview（患者の返答をもとに、医師が続きの質問をする）
     builder.add_edge("patient_env", "interview")
 
-    # Interview 直後: 診断確定済みなら Reflection へ（patient_env はスキップ）
-    builder.add_edge("interview", "reflection", condition=after_interview_to_reflection)
-
-    # --- グラフ設定 ---
-    builder.set_entry_point("pre_consult")       # 最初に動くノード
-    builder.set_max_node_executions(20)            # 問診ループの無限ループ防止
-    builder.reset_on_revisit(True)                 # 同じノードを再訪するとき状態をリセット
+    builder.set_entry_point("pre_consult")
+    builder.set_max_node_executions(20)
+    builder.reset_on_revisit(True)
     return builder.build()

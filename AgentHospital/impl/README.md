@@ -35,5 +35,4 @@ Pre-Consult → Interview ⇄ Patient/Env → Reflection
 ```
 
 - **Pre-Consult / Reflection** — Python ノード（`FunctionNode`）
-- **Interview** — Strands `Agent` + `AgentSkills`
-- **Patient/Env** — Python ノード（症例 JSON）
+- **Interview / Patient/Env** — Strands `Agent`（Patient/Env は症例 JSON でロールプレイ）
