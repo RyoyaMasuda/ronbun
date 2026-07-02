@@ -98,20 +98,43 @@ def build_graph():
     Returns:
         実行可能な Graph インスタンス。エントリポイントは pre_consult。
     """
-    builder = GraphBuilder()
-    builder.add_node(FunctionNode(run_pre_consult, name="pre_consult"), "pre_consult")
-    builder.add_node(FunctionNode(run_patient_env, name="patient_env"), "patient_env")
-    builder.add_node(FunctionNode(run_reflection, name="reflection"), "reflection")
+    # フロー全体:
+    #
+    #   pre_consult ──→ interview ──(診断未確定)──→ patient_env ──┐
+    #                      ↑                                    │
+    #                      └────────────────────────────────────┘
+    #                      │
+    #                      └──(診断確定 [DIAGNOSIS: ...])──→ reflection
+    #
+    # interview から patient_env / reflection の2本のエッジが出ている。
+    # 各エッジの condition が True のときだけその方向へ進む。
 
+    builder = GraphBuilder()
+
+    # --- ノード登録 ---
+    # FunctionNode = Python 関数を Strands ノードとして包むラッパー
+    builder.add_node(FunctionNode(run_pre_consult, name="pre_consult"), "pre_consult")   # 教訓読み込み
+    builder.add_node(FunctionNode(run_patient_env, name="patient_env"), "patient_env")   # 患者の返答（症例 JSON）
+    builder.add_node(FunctionNode(run_reflection, name="reflection"), "reflection")       # 正誤判定・教訓追記
+
+    # Interview だけ LLM Agent（Skills + file_read/shell ツール付き）
     interview: Agent = create_interview_agent()
     builder.add_node(interview, "interview")
-    
-    builder.add_edge("pre_consult", "interview")
+
+    # --- エッジ（遷移）登録 ---
+    builder.add_edge("pre_consult", "interview")  # 診察前準備のあと、必ず問診へ
+
+    # Interview 直後: まだ [DIAGNOSIS: ...] がなければ患者の返答を取りに行く
     builder.add_edge("interview", "patient_env", condition=after_interview_to_patient)
+
+    # Patient/Env の返答をもとに、もう一度 Interview へ（問診ループ）
     builder.add_edge("patient_env", "interview")
+
+    # Interview 直後: 診断確定済みなら Reflection へ（patient_env はスキップ）
     builder.add_edge("interview", "reflection", condition=after_interview_to_reflection)
 
-    builder.set_entry_point("pre_consult")
-    builder.set_max_node_executions(20)
-    builder.reset_on_revisit(True)
+    # --- グラフ設定 ---
+    builder.set_entry_point("pre_consult")       # 最初に動くノード
+    builder.set_max_node_executions(20)            # 問診ループの無限ループ防止
+    builder.reset_on_revisit(True)                 # 同じノードを再訪するとき状態をリセット
     return builder.build()
