@@ -8,6 +8,7 @@ from strands import Agent, AgentSkills
 from strands_tools import file_read, shell
 
 from agent_hospital.config import SKILLS_ROOT
+from agent_hospital.llm import create_llm_model
 
 
 def create_interview_agent() -> Agent:
@@ -20,6 +21,7 @@ def create_interview_agent() -> Agent:
     skills_plugin = AgentSkills(skills=str(SKILLS_ROOT))
     return Agent(
         name="interview",
+        model=create_llm_model(),
         system_prompt=(
             "あなたは医師エージェントです。患者への問診を行い、最終的に診断を下してください。"
             "患者の返答は入力メッセージ（直前ノード patient_env の出力）に含まれます。"

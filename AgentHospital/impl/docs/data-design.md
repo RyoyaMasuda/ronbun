@@ -282,12 +282,12 @@ storage/
 
 ## 10. 決めてからやること（チェックリスト）
 
-- [ ] 症例 20 件の疾患リストを確定
-- [ ] 各症例の `ground_truth` 表記ルールを決める（日本語正式病名など）
-- [ ] `patient_001.json` から `consultation_log` を除去しマスタ化
-- [ ] 症例マスタの TypedDict / JSON Schema を `schemas/` に定義
-- [ ] セッション保存の有無・パスを確定
-- [ ] 症例 JSON を 2 件目以降追加
+- [x] 症例 20 件の疾患リストを確定（`scripts/seed_patients.py`）
+- [x] 各症例の `ground_truth` 表記ルールを決める（日本語正式病名）
+- [x] `patient_001.json` から `consultation_log` を除去しマスタ化
+- [x] 症例マスタの TypedDict を `schemas/patient.py` に定義
+- [x] セッション保存を `storage/sessions/` に分離
+- [x] 症例 JSON を 20 件追加
 - [ ] part2.md の数値・構成を本ドキュメントと揃える
 
 ---

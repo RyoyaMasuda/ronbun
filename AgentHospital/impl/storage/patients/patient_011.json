@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_011",
+  "split": "train",
+  "chief_complaint": "咳と痰、発熱",
+  "history": "5日前から咳が増加。黄色痰。38度の発熱。高齢だが自立。",
+  "exam_results": {
+    "lung": "右下肺野でラ音",
+    "lab": "CRP 8.2"
+  },
+  "ground_truth": "市中肺炎"
+}

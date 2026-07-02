@@ -1,0 +1,12 @@
+{
+  "patient_id": "patient_020",
+  "split": "test",
+  "chief_complaint": "突然の呼吸困難と胸痛",
+  "history": "長時間のデスクワーク。1週間前から左下腿腫脹。本日突然の胸痛。",
+  "exam_results": {
+    "vitals": "SpO2 91%",
+    "leg": "左下腿腫脹・圧痛",
+    "d_dimer": "上昇"
+  },
+  "ground_truth": "肺塞栓症"
+}

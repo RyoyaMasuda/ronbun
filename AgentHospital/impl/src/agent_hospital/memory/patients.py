@@ -1,11 +1,10 @@
-"""症例 JSON（patients/patient_xxx.json）の読み書き。
+"""症例 JSON（patients/patient_xxx.json）の読み込み。
 
-症例の静的データ（主訴・正解など）の読み込みと、
-consultation_log への問診・Reflection 履歴の追記を行う。
+症例マスタは chief_complaint / ground_truth など静的フィールドのみ。
+問診ログは memory/sessions.py に保存する。
 """
 
 import json
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -25,13 +24,13 @@ def patient_path(patient_id: str) -> Path:
 
 
 def load_patient(patient_id: str) -> dict[str, Any]:
-    """症例 JSON を読み込む。
+    """症例マスタ JSON を読み込む。
 
     Args:
         patient_id: 症例 ID。
 
     Returns:
-        症例データ。chief_complaint, ground_truth, consultation_log などを含む。
+        症例マスタ。chief_complaint, ground_truth, split などを含む。
 
     Raises:
         FileNotFoundError: 症例ファイルが存在しない場合。
@@ -42,20 +41,19 @@ def load_patient(patient_id: str) -> dict[str, Any]:
         return json.load(f)
 
 
-def append_patient_log(patient_id: str, entry: dict[str, Any]) -> None:
-    """consultation_log にエントリを追記する。
+def list_patient_ids(*, split: str | None = None) -> list[str]:
+    """manifest.json から症例 ID 一覧を返す。
 
     Args:
-        patient_id: 症例 ID。
-        entry: 追記するログ。role, text など任意のフィールドを含む。
-            保存時に at（UTC ISO8601）が自動付与される。
+        split: "train" / "test" で絞り込み。None なら全件。
 
-    Raises:
-        FileNotFoundError: 症例ファイルが存在しない場合。
+    Returns:
+        patient_id のリスト。
     """
-    path = patient_path(patient_id)
-    data = load_patient(patient_id)
-    logs = data.setdefault("consultation_log", [])
-    logs.append({**entry, "at": datetime.now(timezone.utc).isoformat()})
-    with path.open("w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    manifest_path = PATIENTS_DIR / "manifest.json"
+    with manifest_path.open(encoding="utf-8") as f:
+        manifest = json.load(f)
+    cases = manifest["cases"]
+    if split:
+        cases = [c for c in cases if c.get("split") == split]
+    return [c["patient_id"] for c in cases]

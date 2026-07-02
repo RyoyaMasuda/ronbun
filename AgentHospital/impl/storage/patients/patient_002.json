@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_002",
+  "split": "train",
+  "chief_complaint": "高熱と全身の筋肉痛",
+  "history": "3日前から38.5度前後の発熱。頭痛と関節痛あり。冬場に同僚がインフルと診断された。",
+  "exam_results": {
+    "throat": "咽頭軽度発赤",
+    "lung": "呼吸音清"
+  },
+  "ground_truth": "インフルエンザ"
+}

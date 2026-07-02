@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_019",
+  "split": "test",
+  "chief_complaint": "顔面痛と鼻づまり",
+  "history": "10日前から感冒様症状後、右頬部痛と膿性鼻汁。歯痛様の痛みあり。",
+  "exam_results": {
+    "sinus": "右頬部圧痛",
+    "nasal": "右側膿性鼻汁"
+  },
+  "ground_truth": "急性副鼻腔炎"
+}

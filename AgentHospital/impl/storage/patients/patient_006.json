@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_006",
+  "split": "train",
+  "chief_complaint": "排尿時痛と残尿感",
+  "history": "1日前から頻尿と排尿時灼熱感。発熱は37.2度程度。腰痛なし。",
+  "exam_results": {
+    "urinalysis": "白血球陽性、亀頭部圧痛なし",
+    "abdomen": "下腹部軽圧痛"
+  },
+  "ground_truth": "急性膀胱炎"
+}

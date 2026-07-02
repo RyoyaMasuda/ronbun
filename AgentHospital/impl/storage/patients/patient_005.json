@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_005",
+  "split": "train",
+  "chief_complaint": "胸やけと夜間の咳",
+  "history": "食後や就寝時に胸焼け。2週間前から寝返りで咳が出る。喫煙なし。",
+  "exam_results": {
+    "chest": "胸部聴診異常なし",
+    "abdomen": "上腹部軽圧痛"
+  },
+  "ground_truth": "胃食道逆流症"
+}

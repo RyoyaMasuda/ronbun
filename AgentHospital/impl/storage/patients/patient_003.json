@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_003",
+  "split": "train",
+  "chief_complaint": "右下腹部の強い痛み",
+  "history": "12時間前から臍周囲の痛みが始まり、現在は右下腹部に固定。吐き気あり、食欲低下。",
+  "exam_results": {
+    "abdomen": "右下腹部の圧痛と反跳痛",
+    "lab": "WBC 14000"
+  },
+  "ground_truth": "急性虫垂炎"
+}

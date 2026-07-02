@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_014",
+  "split": "train",
+  "chief_complaint": "右腰背部の激痛",
+  "history": "突然の疝痛様腰痛。血尿あり。嘔吐1回。発熱なし。",
+  "exam_results": {
+    "abdomen": "右側腹部叩打痛",
+    "urinalysis": "血尿+++"
+  },
+  "ground_truth": "尿管結石"
+}

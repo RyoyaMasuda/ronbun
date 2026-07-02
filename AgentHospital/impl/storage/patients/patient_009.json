@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_009",
+  "split": "train",
+  "chief_complaint": "動悸と息切れ",
+  "history": "2週間前から階段上りで息切れ。月経量多い。偏食気味。",
+  "exam_results": {
+    "lab": "Hb 9.2 g/dL, MCV 72",
+    "conjunctiva": "結膜蒼白"
+  },
+  "ground_truth": "鉄欠乏性貧血"
+}

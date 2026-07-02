@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_017",
+  "split": "test",
+  "chief_complaint": "右肘外側の痛み",
+  "history": "2週間前からテニス再開。肘外側が握力で痛む。しびれなし。",
+  "exam_results": {
+    "elbow": "橈骨外側上顆圧痛",
+    "neuro": "橈骨神経領域異常なし"
+  },
+  "ground_truth": "外側上顆炎"
+}

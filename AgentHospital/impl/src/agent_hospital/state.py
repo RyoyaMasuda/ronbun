@@ -42,12 +42,14 @@ class InvocationState(InvocationStateRequired, total=False):
         patient_id: 症例 ID（例: patient_001）。main で設定。
         turn: 問診ターン。Patient/Env がログ記録後に increment。
         global_lessons: 有効な教訓一覧。Pre-Consult が設定。
+        session_id: 診察セッション ID。main が設定。
         diagnosis: Interview が出力した病名。graph の条件関数が設定。
         diagnosis_finalized: 診断確定フラグ。graph の条件関数が設定。
         reflection_rule: 誤診時に追記する教訓文。省略時 Reflection が自動生成。
     """
 
     global_lessons: list[LessonEntry]
+    session_id: str
     diagnosis: str
     diagnosis_finalized: bool
     reflection_rule: str

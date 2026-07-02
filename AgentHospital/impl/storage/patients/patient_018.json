@@ -1,0 +1,12 @@
+{
+  "patient_id": "patient_018",
+  "split": "test",
+  "chief_complaint": "息切れと足のむくみ",
+  "history": "2週間前から平地歩行で息切れ。夜間起座呼吸。高血圧治療中。",
+  "exam_results": {
+    "lung": "両肺底ラ音",
+    "leg": "両下腿浮腫",
+    "vitals": "BP 150/92"
+  },
+  "ground_truth": "心不全"
+}

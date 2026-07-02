@@ -5,8 +5,9 @@ description = "Agent Hospital 小規模再現（Strands + GraphBuilder）"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "strands-agents>=1.45.0",
+    "strands-agents[openai]>=1.45.0",
     "strands-agents-tools>=0.8.0",
+    "python-dotenv>=1.0.0",
 ]
 
 [project.scripts]

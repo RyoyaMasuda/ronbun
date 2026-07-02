@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_004",
+  "split": "train",
+  "chief_complaint": "右側頭部の拍動性頭痛",
+  "history": "4時間前から徐々に増悪。光や音で悪化。前兆なし。月1回程度の類似発作歴。",
+  "exam_results": {
+    "neuro": "神経学的異常なし",
+    "vitals": "BP 118/76"
+  },
+  "ground_truth": "片頭痛"
+}

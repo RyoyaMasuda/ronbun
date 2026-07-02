@@ -5,12 +5,16 @@
 """
 
 from agent_hospital.memory.lessons import append_lesson, deactivate_lesson, read_active_lessons
-from agent_hospital.memory.patients import append_patient_log, load_patient
+from agent_hospital.memory.patients import load_patient, list_patient_ids
+from agent_hospital.memory.sessions import append_session_log, finalize_session, start_session
 
 __all__ = [
     "read_active_lessons",
     "append_lesson",
     "deactivate_lesson",
     "load_patient",
-    "append_patient_log",
+    "list_patient_ids",
+    "start_session",
+    "append_session_log",
+    "finalize_session",
 ]

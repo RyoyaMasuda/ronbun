@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_007",
+  "split": "train",
+  "chief_complaint": "突然の左胸痛と息苦しさ",
+  "history": "瘦せ型。本日急に左側胸痛と呼吸困難。咳嗽なし。外傷なし。",
+  "exam_results": {
+    "lung": "左呼吸音減弱",
+    "vitals": "SpO2 94% 室内気"
+  },
+  "ground_truth": "自然気胸"
+}

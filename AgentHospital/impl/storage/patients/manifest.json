@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "train_count": 15,
+  "test_count": 5,
+  "cases": [
+    {
+      "patient_id": "patient_001",
+      "split": "train",
+      "ground_truth": "帯状疱疹"
+    },
+    {
+      "patient_id": "patient_002",
+      "split": "train",
+      "ground_truth": "インフルエンザ"
+    },
+    {
+      "patient_id": "patient_003",
+      "split": "train",
+      "ground_truth": "急性虫垂炎"
+    },
+    {
+      "patient_id": "patient_004",
+      "split": "train",
+      "ground_truth": "片頭痛"
+    },
+    {
+      "patient_id": "patient_005",
+      "split": "train",
+      "ground_truth": "胃食道逆流症"
+    },
+    {
+      "patient_id": "patient_006",
+      "split": "train",
+      "ground_truth": "急性膀胱炎"
+    },
+    {
+      "patient_id": "patient_007",
+      "split": "train",
+      "ground_truth": "自然気胸"
+    },
+    {
+      "patient_id": "patient_008",
+      "split": "train",
+      "ground_truth": "2型糖尿病"
+    },
+    {
+      "patient_id": "patient_009",
+      "split": "train",
+      "ground_truth": "鉄欠乏性貧血"
+    },
+    {
+      "patient_id": "patient_010",
+      "split": "train",
+      "ground_truth": "急性心筋梗塞"
+    },
+    {
+      "patient_id": "patient_011",
+      "split": "train",
+      "ground_truth": "市中肺炎"
+    },
+    {
+      "patient_id": "patient_012",
+      "split": "train",
+      "ground_truth": "急性胃炎"
+    },
+    {
+      "patient_id": "patient_013",
+      "split": "train",
+      "ground_truth": "過換気症候群"
+    },
+    {
+      "patient_id": "patient_014",
+      "split": "train",
+      "ground_truth": "尿管結石"
+    },
+    {
+      "patient_id": "patient_015",
+      "split": "train",
+      "ground_truth": "甲状腺機能亢進症"
+    },
+    {
+      "patient_id": "patient_016",
+      "split": "test",
+      "ground_truth": "麻疹"
+    },
+    {
+      "patient_id": "patient_017",
+      "split": "test",
+      "ground_truth": "外側上顆炎"
+    },
+    {
+      "patient_id": "patient_018",
+      "split": "test",
+      "ground_truth": "心不全"
+    },
+    {
+      "patient_id": "patient_019",
+      "split": "test",
+      "ground_truth": "急性副鼻腔炎"
+    },
+    {
+      "patient_id": "patient_020",
+      "split": "test",
+      "ground_truth": "肺塞栓症"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_016",
+  "split": "test",
+  "chief_complaint": "発疹と発熱",
+  "history": "3日前から38度前後。今日から顔から体に赤い発疹。予防接種未接種の情報あり。",
+  "exam_results": {
+    "skin": "顔面から体幹へ向かう紅斑性発疹",
+    "oral": "口内コプラジック斑疑い"
+  },
+  "ground_truth": "麻疹"
+}

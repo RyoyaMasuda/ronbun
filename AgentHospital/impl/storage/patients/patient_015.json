@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_015",
+  "split": "train",
+  "chief_complaint": "動悸、汗、体重減少",
+  "history": "1か月で4kg減。手の震え。イライラしやすい。",
+  "exam_results": {
+    "thyroid": "甲状腺腫大、頻脈",
+    "lab": "FT3/FT4 高値"
+  },
+  "ground_truth": "甲状腺機能亢進症"
+}

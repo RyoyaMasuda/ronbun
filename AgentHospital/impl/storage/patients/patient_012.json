@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_012",
+  "split": "train",
+  "chief_complaint": "上腹部痛と吐き気",
+  "history": "昨日から飲酒後に上腹部痛。今日朝に2回嘔吐。下痢なし。",
+  "exam_results": {
+    "abdomen": "上腹部圧痛、反跳痛軽度",
+    "lab": "アミラーゼ正常"
+  },
+  "ground_truth": "急性胃炎"
+}

@@ -9,7 +9,9 @@ from typing import Any, cast
 from strands import Agent
 from strands.multiagent.base import MultiAgentBase, MultiAgentResult, NodeResult, Status
 
-from agent_hospital.memory.patients import append_patient_log, load_patient
+from agent_hospital.llm import create_llm_model
+from agent_hospital.memory.patients import load_patient
+from agent_hospital.memory.sessions import append_session_log
 from agent_hospital.nodes.text_utils import agent_result_text
 from agent_hospital.state import InvocationState
 
@@ -74,12 +76,17 @@ class PatientEnvNode(MultiAgentBase):
 
         agent = Agent(
             name="patient_env",
+            model=create_llm_model(),
             system_prompt=build_patient_system_prompt(patient),
         )
         agent_result = await agent.invoke_async(task, invocation_state)
         reply = agent_result_text(agent_result)
 
-        append_patient_log(patient_id, {"role": "patient", "turn": turn, "text": reply})
+        append_session_log(
+            patient_id,
+            state["session_id"],
+            {"role": "patient", "turn": turn, "text": reply},
+        )
         state["turn"] = turn + 1
 
         node_result = NodeResult(result=agent_result, status=Status.COMPLETED)

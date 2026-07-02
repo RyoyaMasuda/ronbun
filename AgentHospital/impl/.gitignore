@@ -5,3 +5,5 @@ __pycache__/
 .env
 .pytest_cache/
 .mypy_cache/
+storage/sessions/**/*
+!storage/sessions/.gitkeep

@@ -19,3 +19,6 @@ GLOBAL_LESSONS_PATH = STORAGE_ROOT / "doctor" / "global_lessons.json"
 
 PATIENTS_DIR = STORAGE_ROOT / "patients"
 """症例 JSON（patient_xxx.json）のディレクトリ。"""
+
+SESSIONS_DIR = STORAGE_ROOT / "sessions"
+"""診察セッション JSON のディレクトリ。"""

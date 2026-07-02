@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_008",
+  "split": "train",
+  "chief_complaint": "喉の渇きと体重減少",
+  "history": "1か月で3kg減少。多飲多尿。以前健康診断で血糖高値を指摘されたが未受診。",
+  "exam_results": {
+    "lab": "空腹時血糖 286 mg/dL",
+    "urinalysis": "尿糖+++"
+  },
+  "ground_truth": "2型糖尿病"
+}

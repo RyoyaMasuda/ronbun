@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_013",
+  "split": "train",
+  "chief_complaint": "手足のしびれと呼吸が深くなる",
+  "history": "試験前のストレス後に発症。過呼吸感。胸痛なし。",
+  "exam_results": {
+    "vitals": "呼吸数 24/分",
+    "lab": "ABG 軽度呼吸性アルカローシス"
+  },
+  "ground_truth": "過換気症候群"
+}

@@ -1,70 +1,10 @@
 {
   "patient_id": "patient_001",
+  "split": "train",
   "chief_complaint": "左胸に帯状の水ぶくれと痛み",
-  "history": "2日前から発熱。以前に水痘の既往あり。",
-  "ground_truth": "帯状疱疹",
+  "history": "2日前から発熱。小児期に水痘の既往あり。痛みは触ると増強する。",
   "exam_results": {
     "skin_findings": "左前胸部に帯状分布の水疱"
   },
-  "consultation_log": [
-    {
-      "role": "patient",
-      "turn": 0,
-      "text": "左胸に帯状の水ぶくれと痛み",
-      "at": "2026-07-02T12:00:20.331115+00:00"
-    },
-    {
-      "role": "reflection",
-      "diagnosis": "帯状疱疹",
-      "ground_truth": "帯状疱疹",
-      "correct": true,
-      "at": "2026-07-02T12:00:20.332393+00:00"
-    },
-    {
-      "role": "patient",
-      "turn": 0,
-      "text": "左胸に帯状の水ぶくれと痛み",
-      "at": "2026-07-02T12:25:31.440428+00:00"
-    },
-    {
-      "role": "reflection",
-      "diagnosis": "帯状疱疹",
-      "ground_truth": "帯状疱疹",
-      "correct": true,
-      "at": "2026-07-02T12:25:31.442071+00:00"
-    },
-    {
-      "role": "patient",
-      "turn": 0,
-      "text": "左胸に帯状の水ぶくれと痛み",
-      "at": "2026-07-02T12:38:05.418789+00:00"
-    },
-    {
-      "role": "reflection",
-      "diagnosis": "帯状疱疹",
-      "ground_truth": "帯状疱疹",
-      "correct": true,
-      "at": "2026-07-02T12:38:05.419153+00:00"
-    },
-    {
-      "role": "patient",
-      "turn": 0,
-      "text": "左胸に帯状の水ぶくれと痛み",
-      "at": "2026-07-02T12:47:13.768691+00:00"
-    },
-    {
-      "role": "reflection",
-      "diagnosis": "帯状疱疹",
-      "ground_truth": "帯状疱疹",
-      "correct": true,
-      "at": "2026-07-02T12:47:13.770070+00:00"
-    },
-    {
-      "role": "reflection",
-      "diagnosis": "帯状疱疹",
-      "ground_truth": "帯状疱疹",
-      "correct": true,
-      "at": "2026-07-02T13:21:21.058696+00:00"
-    }
-  ]
+  "ground_truth": "帯状疱疹"
 }

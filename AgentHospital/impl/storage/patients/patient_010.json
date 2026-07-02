@@ -1,0 +1,11 @@
+{
+  "patient_id": "patient_010",
+  "split": "train",
+  "chief_complaint": "突然の胸骨後部痛",
+  "history": "60代男性。30分前から持続する重い胸痛。冷汗あり。喫煙歴20年。",
+  "exam_results": {
+    "ecg": "ST上昇",
+    "vitals": "BP 90/60, 頻脈"
+  },
+  "ground_truth": "急性心筋梗塞"
+}
