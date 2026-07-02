@@ -6,10 +6,13 @@
 
 ```
 impl/
+├── docs/                 # 設計ドキュメント（data-design.md など）
 ├── src/agent_hospital/   # Python（グラフ・ノード・記憶ロジック）
 ├── skills/               # Agent Skills（SKILL.md + scripts/）
 └── storage/              # 実行時データ（教訓・症例 JSON）
 ```
+
+設計のたたき台: [docs/data-design.md](docs/data-design.md)
 
 ## セットアップ
 

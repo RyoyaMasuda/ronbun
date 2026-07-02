@@ -58,6 +58,13 @@
       "ground_truth": "帯状疱疹",
       "correct": true,
       "at": "2026-07-02T12:47:13.770070+00:00"
+    },
+    {
+      "role": "reflection",
+      "diagnosis": "帯状疱疹",
+      "ground_truth": "帯状疱疹",
+      "correct": true,
+      "at": "2026-07-02T13:21:21.058696+00:00"
     }
   ]
 }
