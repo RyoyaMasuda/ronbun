@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Part 0 — Agent Hospital Qiita 投稿</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+    color: #24292f;
+    line-height: 1.75;
+    background: #fff;
+  }
+  .part-label {
+    display: inline-block;
+    font-size: 0.82em;
+    font-weight: 600;
+    color: #57606a;
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+    border-radius: 999px;
+    padding: 4px 12px;
+    margin-bottom: 1em;
+  }
+  h1 {
+    font-size: 1.65em;
+    line-height: 1.35;
+    margin: 0 0 0.6em;
+    border: none;
+  }
+  h2 {
+    font-size: 1.35em;
+    margin-top: 2.4em;
+    margin-bottom: 0.6em;
+    padding-bottom: 0.35em;
+    border-bottom: 2px solid #222;
+  }
+  h3 {
+    font-size: 1.08em;
+    margin-top: 1.6em;
+    margin-bottom: 0.4em;
+  }
+  p { margin: 0.75em 0; }
+  ul { margin: 0.6em 0; padding-left: 1.4em; }
+  li { margin: 0.35em 0; }
+  a { color: #0969da; }
+  blockquote {
+    margin: 1.2em 0;
+    padding: 12px 16px;
+    background: #fff8c5;
+    border-left: 4px solid #d4a72c;
+    color: #57606a;
+    font-size: 0.92em;
+  }
+  .tldr {
+    background: #f6f8fa;
+    border-left: 4px solid #0969da;
+    padding: 16px 20px;
+    margin: 1.2em 0 2em;
+    border-radius: 0 6px 6px 0;
+  }
+  .tldr ul { margin-top: 0.4em; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+    font-size: 0.94em;
+  }
+  th, td {
+    border: 1px solid #d0d7de;
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th { background: #f6f8fa; }
+  pre {
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-size: 0.88em;
+    line-height: 1.5;
+  }
+  .refs {
+    margin-top: 3em;
+    padding-top: 1.5em;
+    border-top: 1px solid #d0d7de;
+    font-size: 0.94em;
+  }
+  .refs h2 { font-size: 1.15em; margin-top: 0; }
+</style>
+</head>
+<body>
+
+<p class="part-label">Part 0 — TL;DR / はじめに</p>
+
+<h1>【論文×実装】Agent Hospital — SEAL/MedAgent-Zeroの解説、小規模再現とRAGチャットへの適応</h1>
+
+<blockquote>
+  本ページは <strong>Part 0</strong>（0. TL;DR / 1. はじめに）です。Part 1 以降は別ファイルで執筆します。
+</blockquote>
+
+<h2>0. TL;DR</h2>
+
+<div class="tldr">
+<ul>
+  <li><strong>Agent Hospital</strong> は、患者・医師・看護師がすべて LLM エージェントである<strong>仮想病院（シミュラクラ）</strong>。診察〜治療をシミュレーションし、医師エージェントが経験を積んで「進化」する論文（清華大学 AIR 等, <a href="https://arxiv.org/abs/2405.02957">arXiv:2405.02957</a>）。</li>
+  <li>進化の中核は <strong>MedAgent-Zero</strong>。症例ラベル付きデータでファインチューニングするのではなく、<strong>凍結した LLM</strong> に <strong>反省ループ + 経験ベース（RAG）</strong> を載せて強くする。</li>
+  <li>仮想病院で約数万人の患者を診た後、<strong>MedQA</strong>（USMLE 形式）で既存手法を上回る精度（GPT-4o ベースで 92% 超）を報告している。</li>
+  <li>本記事では、(1) 論文の解説、(2) ミニ版の再現、(3) 再現で得た知見を<strong>病院向け RAG チャットアプリ</strong>にどう活かせるか、の3つを扱う。</li>
+</ul>
+</div>
+
+<h2>1. はじめに</h2>
+
+<h3>1-1. この記事でやること</h3>
+
+<p>
+現在、<strong>病院向けの RAG チャットアプリ</strong>（院内マニュアル等を検索して回答する構成）を開発しています。単純な RAG でも一定の用途には足りますが、今後はワークフロー制御やツール利用など<strong>エージェント的な拡張</strong>を検討しています。
+</p>
+
+<p>
+その調査の一環で、医療ドメインのマルチエージェント論文 <strong>Agent Hospital</strong> に出会い、次の3段階で整理することにしました。
+</p>
+
+<table>
+  <thead>
+    <tr><th>段階</th><th>内容</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>論文解説</strong></td><td>SEAL / MedAgent-Zero を中心に、論文をエンジニア視点で読み解く</td></tr>
+    <tr><td><strong>小規模再現</strong></td><td>Agent Hospital のミニ版を構築し、動かしてみる</td></tr>
+    <tr><td><strong>RAG チャットへの適応</strong></td><td>再現で得た設計パターンを、現行の RAG チャットにどう転用できるか考える</td></tr>
+  </tbody>
+</table>
+
+<p>
+「RAG チャットだから全部 RAG で解決する」必要はありません。Agent Hospital も RAG・シミュレーション・反省・グラフ制御が組み合わさっており、<strong>RAG 以外のロジックを別レイヤーで足せる</strong>好例だと捉えています。
+</p>
+
+<p>
+本記事は製品の宣伝ではなく、<strong>実務の延長での論文読解と再現ログ</strong>です。サービス名・クライアント名は出しません。
+</p>
+
+<h3>1-2. 対象読者</h3>
+
+<ul>
+  <li>LLM / マルチエージェントに興味があるデータサイエンティストやエンジニア</li>
+  <li>小規模に再現してみたい人、内容解説だけでなく実装例もほしい人</li>
+  <li>RAG / チャットボットを開発している人</li>
+</ul>
+
+<h3>1-3. 記事の構成</h3>
+
+<p>記事全体は次の Part に分かれています（<strong>本ファイルは Part 0 のみ</strong>）。</p>
+
+<pre>Part 0 … 0. TL;DR / 1. はじめに          ← 本ファイル
+Part 1 … 2〜7章：論文解説
+Part 2 … 8〜10章：ミニ版の設計・実装・結果
+Part 3 … 11〜13章：RAG チャットへの適応・まとめ</pre>
+
+<p>
+<strong>Part 1（論文解説）</strong> では、背景・SEAL・MedAgent-Zero・実験結果・読んで残った疑問を扱います。MedQA による「仮想→現実」のアライメントは論文側の話として 6 章で解説します。
+</p>
+
+<p>
+<strong>Part 2（小規模再現）</strong> では、論文の一部を省略したミニ版 Agent Hospital を AWS Strands 等で構築し、進化前後の挙動を確認します。
+</p>
+
+<p>
+<strong>Part 3（RAG チャットへの適応）</strong> では、Part 3 の「適応」は MedQA の全量再現や実臨床投入<strong>ではありません</strong>。反省ループ・経験蓄積・ワークフロー分離など、<strong>院内資料 Q&A 向け RAG チャットに持ち帰れるパターン</strong>を整理します。
+</p>
+
+<p>
+動機や開発背景の詳細は <strong>2 章</strong>、適用の具体案は <strong>11 章</strong> で述べます。Part 0 では全体像だけ押さえておいてください。
+</p>
+
+<div class="refs">
+  <h2>参考（記事全体）</h2>
+  <ul>
+    <li>原著論文：<a href="https://arxiv.org/abs/2405.02957">Agent Hospital: A Simulacrum of Hospital with Evolvable Medical Agents</a>（Li et al., Tsinghua AIR）</li>
+    <li>全文日本語訳（非公式）：別途リンク予定</li>
+  </ul>
+</div>
+
+</body>
+</html>
